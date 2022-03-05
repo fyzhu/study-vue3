@@ -1,24 +1,45 @@
 const data = {
-  text: 1234,
+  text: 123,
 };
-const bucket = [];
+let activeEffect = null
+function effect(fn) {
+  activeEffect = fn
+  activeEffect()
+}
+const bucket = new Set;
 const obj = new Proxy(data, {
   get(target, key) {
-    bucket.push(effect);
+    if(activeEffect) {
+      bucket.add(activeEffect);
+      // activeEffect = null
+    }
     return target[key];
   },
   set(target, key, value) {
     target[key] = value;
-    bucket.forEach((item) => item());
+    bucket.forEach((fn) => fn());
+    return true
   },
 });
-function effect() {
+
+
+
+effect(function () {
+  console.log('effect run');
   document.body.innerText = obj.text;
-}
-effect();
+});
 
 setTimeout(() => {
   obj.text = 456;
 }, 1000);
 
-// document.body.appendChild(test)
+setTimeout(() => {
+  obj.noExist = 789
+}, 2000);
+setTimeout(() => {
+  obj.noExist = 389
+}, 3000);
+
+setTimeout(() => {
+  obj.noExist = 389
+}, 4000);
