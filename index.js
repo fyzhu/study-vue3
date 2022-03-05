@@ -1,27 +1,24 @@
-const o = {
-  text: 12344
-}
-const buket = []
-const obj = new Proxy(o, {
+const data = {
+  text: 1234,
+};
+const bucket = [];
+const obj = new Proxy(data, {
   get(target, key) {
-    buket.push(effect)
-    return target[key]
+    bucket.push(effect);
+    return target[key];
   },
   set(target, key, value) {
-    target[key] = value
-    buket.forEach(item => item())
-  }
-})
+    target[key] = value;
+    bucket.forEach((item) => item());
+  },
+});
 function effect() {
-  let test = document.querySelector('#test')
-  test.innerHTML  = obj.text
+  document.body.innerText = obj.text;
 }
-effect()
+effect();
 
 setTimeout(() => {
-  
-  obj.text = 456
+  obj.text = 456;
 }, 1000);
-
 
 // document.body.appendChild(test)
