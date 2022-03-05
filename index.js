@@ -1,20 +1,26 @@
 const data = {
+  ok: true,
   text: 123,
 };
 let activeEffect = null;
 function effect(fn) {
-  activeEffect = fn;
-  activeEffect();
+  function effectFn() {
+    cleanup(effectFn);
+    activeEffect = effectFn;
+    fn();
+  }
+  effectFn.deps = [];
+  effectFn();
 }
 const bucket = new WeakMap();
 const obj = new Proxy(data, {
   get(target, key) {
-    track(target, key)
+    track(target, key);
     return target[key];
   },
   set(target, key, value) {
     target[key] = value;
-    trigger(target, key)
+    trigger(target, key);
     // return true;
   },
 });
@@ -29,31 +35,42 @@ function track(target, key) {
     depsMap.set(key, (deps = new Set()));
   }
   deps.add(activeEffect);
+  activeEffect.deps.push(deps);
 }
 
 function trigger(target, key) {
   let depsMap = bucket.get(target);
   if (!depsMap) return;
   let deps = depsMap.get(key);
-  deps && deps.forEach((fn) => fn());
+  let oldDeps = new Set(deps);
+  oldDeps.forEach((fn) => fn());
+  // deps && deps.forEach((fn) => fn());
 }
-
+function cleanup(effectFn) {
+  for (const deps of effectFn.deps) {
+    deps.delete(effectFn);
+  }
+  effectFn.deps.length = 0;
+}
 effect(function () {
   console.log("effect run");
-  document.body.innerText = obj.text;
+  document.body.innerText = obj.ok ? obj.text : "not";
 });
 
 setTimeout(() => {
-  obj.text = 456;
+  obj.ok = false;
 }, 1000);
 
 setTimeout(() => {
-  obj.noExist = 789;
+  console.log("3");
+  obj.text = 789;
 }, 2000);
 setTimeout(() => {
-  obj.noExist = 389;
+  console.log("4");
+  obj.text = 389;
 }, 3000);
 
 setTimeout(() => {
-  obj.noExist = 389;
+  console.log("5");
+  obj.text = 489;
 }, 4000);
