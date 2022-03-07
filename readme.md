@@ -10,6 +10,7 @@
 分支切换 和 cleanup  
 ```
 obj.ok ? obj.text : 'not'
+解决 forEach 中 删除再增加 导致的无限循环问题
 ```
 ### 0.0.6
 嵌套 effect
