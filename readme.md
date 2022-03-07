@@ -12,4 +12,4 @@
 obj.ok ? obj.text : 'not'
 ```
 ### 0.0.6
-
+嵌套 effect
