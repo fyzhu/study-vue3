@@ -2,6 +2,7 @@ const data = {
   text: 1234,
 };
 const bucket = [];
+let temp
 const obj = new Proxy(data, {
   get(target, key) {
     bucket.push(effect);
@@ -13,7 +14,9 @@ const obj = new Proxy(data, {
   },
 });
 function effect() {
-  document.body.innerText = obj.text;
+  // document.body.innerText = obj.text;
+  temp = obj.text
+  console.log(temp);
 }
 effect();
 
