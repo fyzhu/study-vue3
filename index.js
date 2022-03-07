@@ -48,14 +48,14 @@ function trigger(target, key) {
   let depsMap = bucket.get(target);
   if (!depsMap) return;
   let deps = depsMap.get(key);
-  let oldDeps = new Set();
-  deps &&
-    deps.forEach((effectFn) => {
-      if (effectFn !== activeEffect) {
-        oldDeps.add(effectFn);
-      }
-    });
-  oldDeps.forEach((fn) => fn());
+  let oldDeps = new Set(deps);
+  // deps &&
+  //   deps.forEach((effectFn) => {
+  //     if (effectFn !== activeEffect) {
+  //       oldDeps.add(effectFn);
+  //     }
+  //   });
+  oldDeps.forEach((fn) => fn !== activeEffect && fn());
   // deps && deps.forEach((fn) => fn());
 }
 function cleanup(effectFn) {
