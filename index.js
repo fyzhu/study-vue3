@@ -2,6 +2,7 @@ const data = {
   text: 123,
 };
 let activeEffect = null
+let temp
 function effect(fn) {
   activeEffect = fn
   activeEffect()
@@ -26,7 +27,8 @@ const obj = new Proxy(data, {
 
 effect(function () {
   console.log('effect run');
-  document.body.innerText = obj.text;
+  // document.body.innerText = obj.text;
+  temp = obj.text
 });
 
 setTimeout(() => {
