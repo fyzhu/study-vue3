@@ -13,3 +13,9 @@ obj.ok ? obj.text : 'not'
 ```
 ### 0.0.6
 嵌套 effect
+
+### 0.0.7
+避免无限递归循环
+```
+obj.foo = obj.foo + 1;
+```

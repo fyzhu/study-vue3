@@ -1,19 +1,19 @@
 const data = {
   ok: true,
-  foo: true,
+  foo: 1,
   bar: true,
   text: 123,
 };
 let activeEffect = null;
-const effectStack = []
+const effectStack = [];
 function effect(fn) {
   function effectFn() {
     cleanup(effectFn);
     activeEffect = effectFn;
-    effectStack.push(activeEffect)
+    effectStack.push(activeEffect);
     fn();
-    effectStack.pop()
-    activeEffect = effectStack[effectStack.length - 1]
+    effectStack.pop();
+    activeEffect = effectStack[effectStack.length - 1];
   }
   effectFn.deps = [];
   effectFn();
@@ -48,7 +48,13 @@ function trigger(target, key) {
   let depsMap = bucket.get(target);
   if (!depsMap) return;
   let deps = depsMap.get(key);
-  let oldDeps = new Set(deps);
+  let oldDeps = new Set();
+  deps &&
+    deps.forEach((effectFn) => {
+      if (effectFn !== activeEffect) {
+        oldDeps.add(effectFn);
+      }
+    });
   oldDeps.forEach((fn) => fn());
   // deps && deps.forEach((fn) => fn());
 }
@@ -58,33 +64,19 @@ function cleanup(effectFn) {
   }
   effectFn.deps.length = 0;
 }
-let temp1, temp2
+let temp1, temp2;
 effect(function () {
   console.log("effect1 run");
-  effect(function test(){
-    console.log('effect2 run');
-    temp2 = obj.bar
-  })
-  temp1 = obj.foo
+
+  obj.foo = obj.foo + 1;
+  console.log("foo", obj.foo);
   // document.body.innerText = obj.ok ? obj.text : "not";
 });
 
 setTimeout(() => {
-  obj.foo = false;
+  // console.log("");
+  obj.foo = 999;
 }, 1000);
-// setTimeout(() => {
-//   obj.foo = true;
-// }, 1500);
-setTimeout(() => {
-  obj.bar = false;
-}, 2000);
-setTimeout(() => {
-  obj.bar = true
-}, 3000);
-// setTimeout(() => {
-//   console.log("4");
-//   obj.text = 389;
-// }, 3000);
 
 // setTimeout(() => {
 //   console.log("5");
