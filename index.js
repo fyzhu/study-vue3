@@ -1,7 +1,8 @@
 const data = {
   text: 123,
 };
-let activeEffect = null;
+let activeEffect = null
+let temp
 function effect(fn) {
   activeEffect = fn;
   activeEffect();
@@ -39,8 +40,9 @@ function trigger(target, key) {
 }
 
 effect(function () {
-  console.log("effect run");
-  document.body.innerText = obj.text;
+  console.log('effect run');
+  // document.body.innerText = obj.text;
+  temp = obj.text
 });
 
 setTimeout(() => {
