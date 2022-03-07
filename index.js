@@ -1,13 +1,19 @@
 const data = {
   ok: true,
+  foo: true,
+  bar: true,
   text: 123,
 };
 let activeEffect = null;
+const effectStack = []
 function effect(fn) {
   function effectFn() {
     cleanup(effectFn);
     activeEffect = effectFn;
+    effectStack.push(activeEffect)
     fn();
+    effectStack.pop()
+    activeEffect = effectStack[effectStack.length - 1]
   }
   effectFn.deps = [];
   effectFn();
@@ -52,25 +58,35 @@ function cleanup(effectFn) {
   }
   effectFn.deps.length = 0;
 }
+let temp1, temp2
 effect(function () {
-  console.log("effect run");
-  document.body.innerText = obj.ok ? obj.text : "not";
+  console.log("effect1 run");
+  effect(function test(){
+    console.log('effect2 run');
+    temp2 = obj.bar
+  })
+  temp1 = obj.foo
+  // document.body.innerText = obj.ok ? obj.text : "not";
 });
 
 setTimeout(() => {
-  obj.ok = false;
+  obj.foo = false;
 }, 1000);
-
+// setTimeout(() => {
+//   obj.foo = true;
+// }, 1500);
 setTimeout(() => {
-  console.log("3");
-  obj.text = 789;
+  obj.bar = false;
 }, 2000);
 setTimeout(() => {
-  console.log("4");
-  obj.text = 389;
+  obj.bar = true
 }, 3000);
+// setTimeout(() => {
+//   console.log("4");
+//   obj.text = 389;
+// }, 3000);
 
-setTimeout(() => {
-  console.log("5");
-  obj.text = 489;
-}, 4000);
+// setTimeout(() => {
+//   console.log("5");
+//   obj.text = 489;
+// }, 4000);
