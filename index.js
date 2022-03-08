@@ -32,6 +32,7 @@ const obj = new Proxy(data, {
 });
 
 function track(target, key) {
+  if(!activeEffect) return
   let depsMap = bucket.get(target);
   if (!depsMap) {
     bucket.set(target, (depsMap = new Map()));
