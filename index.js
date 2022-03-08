@@ -70,21 +70,24 @@ effect(function () {
 });
 
 setTimeout(() => {
+  console.log('给 obj.foo 赋值，应该依次执行 effect1，effect2');
   obj.foo = false;
 }, 1000);
 // setTimeout(() => {
 //   obj.foo = true;
 // }, 1500);
 setTimeout(() => {
+  console.log('给 obj.bar 赋值，应该执行 effect2 一次');
   obj.bar = false;
 }, 2000);
 setTimeout(() => {
+  console.log('给 obj.bar 赋值，应该执行 effect2 一次');
   obj.bar = true
 }, 3000);
-// setTimeout(() => {
-//   console.log("4");
-//   obj.text = 389;
-// }, 3000);
+setTimeout(() => {
+  console.log("读取 obj 的属性，不应该报错");
+  console.log(obj.bar);
+}, 3000);
 
 // setTimeout(() => {
 //   console.log("5");
