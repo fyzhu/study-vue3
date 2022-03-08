@@ -5,15 +5,15 @@ const data = {
   text: 123,
 };
 let activeEffect = null;
-const effectStack = []
+const effectStack = [];
 function effect(fn) {
   function effectFn() {
     cleanup(effectFn);
     activeEffect = effectFn;
-    effectStack.push(activeEffect)
+    effectStack.push(activeEffect);
     fn();
-    effectStack.pop()
-    activeEffect = effectStack[effectStack.length - 1]
+    effectStack.pop();
+    activeEffect = effectStack[effectStack.length - 1];
   }
   effectFn.deps = [];
   effectFn();
@@ -32,7 +32,7 @@ const obj = new Proxy(data, {
 });
 
 function track(target, key) {
-  if(!activeEffect) return
+  if (!activeEffect) return;
   let depsMap = bucket.get(target);
   if (!depsMap) {
     bucket.set(target, (depsMap = new Map()));
@@ -59,31 +59,31 @@ function cleanup(effectFn) {
   }
   effectFn.deps.length = 0;
 }
-let temp1, temp2
+let temp1, temp2;
 effect(function () {
   console.log("effect1 run");
-  effect(function test(){
-    console.log('effect2 run');
-    temp2 = obj.bar
-  })
-  temp1 = obj.foo
+  effect(function test() {
+    console.log("effect2 run");
+    temp2 = obj.bar;
+  });
+  temp1 = obj.foo;
   // document.body.innerText = obj.ok ? obj.text : "not";
 });
 
 setTimeout(() => {
-  console.log('给 obj.foo 赋值 false，应该依次执行 effect1，effect2');
+  console.log("给 obj.foo 赋值 false，应该依次执行 effect1，effect2");
   obj.foo = false;
 }, 1000);
 // setTimeout(() => {
 //   obj.foo = true;
 // }, 1500);
 setTimeout(() => {
-  console.log('给 obj.bar 赋值 false，应该执行 effect2 一次');
+  console.log("给 obj.bar 赋值 false，应该执行 effect2 一次");
   obj.bar = false;
 }, 2000);
 setTimeout(() => {
-  console.log('给 obj.bar 赋值 true，应该执行 effect2 一次');
-  obj.bar = true
+  console.log("给 obj.bar 赋值 true，应该执行 effect2 一次");
+  obj.bar = true;
 }, 3000);
 setTimeout(() => {
   console.log("读取 obj.bar 的值");
