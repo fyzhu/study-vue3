@@ -21,3 +21,5 @@ obj.ok ? obj.text : 'not'
 ```
 obj.foo = obj.foo + 1;
 ```
+### 0.0.8
+调度执行
