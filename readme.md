@@ -12,6 +12,6 @@
 obj.ok ? obj.text : 'not'
 ```
 ### 0.0.6
-解决： effect 嵌套
-问题1：deps 重复添加 activeEffect
+解决： effect 嵌套  
+问题1：deps 重复添加 activeEffect  
 问题2：obj 属性读取报错
