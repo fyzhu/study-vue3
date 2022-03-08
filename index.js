@@ -54,23 +54,25 @@ function cleanup(effectFn) {
 }
 effect(function () {
   console.log("effect run");
-  document.body.innerText = obj.ok ? obj.text : "not";
+  console.log(obj.ok ? obj.text : "not");
+  // document.body.innerText = obj.ok ? obj.text : "not";
 });
 
 setTimeout(() => {
+  console.log('obj.ok 设置为 false');
   obj.ok = false;
 }, 1000);
 
 setTimeout(() => {
-  console.log("3");
+  console.log("更改 obj.txt 的值，不应该执行 effect");
   obj.text = 789;
 }, 2000);
 setTimeout(() => {
-  console.log("4");
-  obj.text = 389;
+  console.log("obj.ok 设置为 true");
+  obj.ok = true;
 }, 3000);
 
 setTimeout(() => {
-  console.log("5");
+  console.log("更改 obj.txt 的值，应该执行 effect");
   obj.text = 489;
 }, 4000);
