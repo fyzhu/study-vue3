@@ -1,7 +1,7 @@
 const data = {
   ok: true,
   foo: 1,
-  bar: true,
+  bar: 2,
   text: 123,
 };
 let activeEffect = null;
@@ -23,13 +23,17 @@ function effect(fn, options = {}) {
     cleanup(effectFn);
     activeEffect = effectFn;
     effectStack.push(activeEffect);
-    fn();
+    const res = fn();
     effectStack.pop();
     activeEffect = effectStack[effectStack.length - 1];
+    return res;
   }
   effectFn.options = options;
   effectFn.deps = [];
-  effectFn();
+  if (!options.lazy) {
+    effectFn();
+  }
+  return effectFn;
 }
 const bucket = new WeakMap();
 const obj = new Proxy(data, {
@@ -84,25 +88,39 @@ function cleanup(effectFn) {
   }
   effectFn.deps.length = 0;
 }
-let temp1, temp2;
-effect(
-  function () {
-    // console.log("effect1 run");
-    // obj.foo = obj.foo + 1;
-    console.log("foo", obj.foo);
-    // document.body.innerText = obj.ok ? obj.text : "not";
-  },
-  {
-    scheduler(fn) {
-      jobQueue.add(fn);
-      flushJob();
-    },
-  }
-);
 
-obj.foo++;
-obj.foo++;
-obj.foo++;
+function computed(getter) {
+  let value
+  let dirty = true
+  const effectFn = effect(getter, {
+    lazy: true,
+    scheduler(fn) {
+      dirty = true
+      trigger(obj, 'value')
+    },
+  });
+
+  const obj = {
+    get value() {
+      if(dirty){
+        value = effectFn()
+        dirty = false
+      }
+      track(obj, 'value')
+      return value;
+    },
+  };
+  return obj;
+}
+const sum = computed(()=> obj.bar + obj.foo)
+// console.log(sum.value);
+// console.log(sum.value);
+
+effect(()=> console.log(sum.value))
+obj.bar = 300
+// obj.foo++;
+// obj.foo++;
+// obj.foo++;
 // console.log('end');
 // setTimeout(() => {
 //   console.log("5");
