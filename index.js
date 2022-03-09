@@ -6,6 +6,18 @@ const data = {
 };
 let activeEffect = null;
 const effectStack = [];
+const jobQueue = new Set();
+const p = Promise.resolve();
+let isFlushing = false;
+function flushJob() {
+  if (isFlushing) return;
+  isFlushing = true;
+  p.then(() => {
+    jobQueue.forEach((job) => job());
+  }).finally(() => {
+    isFlushing = false;
+  });
+}
 function effect(fn, options = {}) {
   function effectFn() {
     cleanup(effectFn);
@@ -58,10 +70,10 @@ function trigger(target, key) {
       }
     });
   oldDeps.forEach((effectFn) => {
-    if(effectFn.options.scheduler) {
-      effectFn.options.scheduler(effectFn)
-    }else {
-      effectFn()
+    if (effectFn.options.scheduler) {
+      effectFn.options.scheduler(effectFn);
+    } else {
+      effectFn();
     }
   });
   // deps && deps.forEach((fn) => fn());
@@ -73,21 +85,25 @@ function cleanup(effectFn) {
   effectFn.deps.length = 0;
 }
 let temp1, temp2;
-effect(function () {
-  // console.log("effect1 run");
-  // obj.foo = obj.foo + 1;
-  console.log("foo", obj.foo);
-  // document.body.innerText = obj.ok ? obj.text : "not";
-},{
-  scheduler(fn) {
-    setTimeout(() => {
-      fn()
-    });
+effect(
+  function () {
+    // console.log("effect1 run");
+    // obj.foo = obj.foo + 1;
+    console.log("foo", obj.foo);
+    // document.body.innerText = obj.ok ? obj.text : "not";
+  },
+  {
+    scheduler(fn) {
+      jobQueue.add(fn);
+      flushJob();
+    },
   }
-});
+);
 
 obj.foo++;
-console.log('end');
+obj.foo++;
+obj.foo++;
+// console.log('end');
 // setTimeout(() => {
 //   console.log("5");
 //   obj.text = 489;
