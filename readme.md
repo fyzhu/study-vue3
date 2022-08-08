@@ -28,3 +28,4 @@ obj.foo = obj.foo + 1;
 基于调度器忽略 过渡状态
 ### 0.0.10
 计算属性 computed 和 lazy
+## 虚拟 DOM
